@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.DormDetailedDao">
+
+
+    <select id="queryList" resultType="com.ketansoft.dms.entity.DormDetailedEntity">
+        select a.d_id,b.r_id,a.d_address,a.d_type,a.u_id,b.room_name,b.p_id,c.use_admin,d.use_unit from dorm as a,dorm_room as b,use_admin as c,use_unit as d
+
+        <where>
+            a.d_id=b.parent_id and a.u_id=c.u_id and a.t_id=d.t_id and b.status=1
+            <!--<if test="bgTime!=null and bgTime.trim()!=null">-->
+                <!--and e.check_in_time &gt;= #{bgTime}  and a.d_id=e.d_id-->
+            <!--</if>-->
+            <!--<if test="endTime!=null and endTime.trim()!=null">-->
+                <!--and e.expected_due_time &lt;= #{endTime} and a.d_id=e.d_id-->
+            <!--</if>-->
+        </where>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+
+    </select>
+
+    <select id="queryTimeList" resultType="com.ketansoft.dms.entity.DormDetailedEntity">
+    select distinct a.d_id,b.r_id,a.d_address,a.d_type,a.u_id,b.room_name,b.p_id,c.use_admin,d.use_unit from dorm as a,dorm_room as b,use_admin as c,use_unit as d,dprelationship as e
+
+    <where>
+        a.d_id=b.parent_id and a.u_id=c.u_id and a.t_id=d.t_id and  e.p_id=b.p_id and e.check_in_time &gt;= #{bgTime} and e.expected_due_time &lt;= #{endTime} and e.status=1 and b.status=1
+
+    </where>
+    <if test="offset != null and limit != null">
+        limit #{offset}, #{limit}
+    </if>
+    </select>
+
+    <select id="excelList" resultType="com.ketansoft.dms.entity.DormDetailedEntity">
+       select a.d_id,a.d_address,b.r_id,a.d_type,a.u_id,b.room_name,b.p_id,c.use_admin,d.use_unit from dorm as a,dorm_room as b,use_admin as c ,use_unit as d where a.d_id=b.parent_id and a.u_id=c.u_id and a.t_id=d.t_id
+
+    </select>
+
+    <select id="selectList" resultType="com.ketansoft.dms.entity.DormDetailedEntity">
+        select a.d_id,a.d_address,b.r_id,a.d_type,a.u_id,b.room_name,b.p_id,c.use_admin,d.use_unit from dorm as a,dorm_room as b,use_admin as c ,use_unit as d where  a.d_id=b.parent_id and a.u_id=c.u_id and a.t_id=d.t_id and b.r_id in
+        <foreach item="rId" collection="rIds" open="(" separator="," close=")">
+            #{rId}
+        </foreach>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from dorm as a,dorm_room as b,use_admin as c,use_unit as d where a.d_id=b.parent_id and a.u_id=c.u_id and a.t_id=d.t_id
+    </select>
+</mapper>

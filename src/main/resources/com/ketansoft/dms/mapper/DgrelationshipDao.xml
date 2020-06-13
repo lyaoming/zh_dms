@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.DgrelationshipDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.DgrelationshipEntity">
+		select a.gd_id,a.g_id,a.r_id,a.d_id,b.d_address,c.g_name,a.gd_number,b.d_specification,c.g_specification,c.g_type from dgrelationship as a,dorm as b,goods as c where a.d_id=b.d_id and a.g_id=c.g_id and gd_id = #{value}
+	</select>
+
+	<select id="querySame" resultType="com.ketansoft.dms.entity.DgrelationshipEntity">
+		select * from dgrelationship
+		<where>
+		d_id=#{dId} and g_id=#{gId} and r_id=#{rId}
+	    </where>
+	</select>
+
+	<select id="peizhiList" resultType="com.ketansoft.dms.entity.DgrelationshipEntity">
+		select c.g_name,a.gd_number,c.g_specification,c.g_type from dgrelationship as a,dorm as b,goods as c,dorm_room as d
+		 <where>
+		  a.d_id=b.d_id and a.g_id=c.g_id and a.r_id=d.r_id and a.d_id=#{dId}
+		  <if test="rId!=null">
+			 and d.r_id=#{rId}
+		  </if>
+		  </where>
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.DgrelationshipEntity">
+
+		select a.gd_id,a.g_id,a.d_id,b.d_address,c.g_name,a.gd_number,b.d_specification,c.g_specification,c.g_type,c.g_number,a.r_id from dgrelationship as a,dorm as b,goods as c where a.d_id=b.d_id and a.g_id=c.g_id and a.d_id=#{dId}
+
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from dgrelationship 
+	</select>
+
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.DgrelationshipEntity">
+		insert into dgrelationship
+		(
+												`gd_id`, 
+															`d_id`, 
+															`g_id`,
+															`gd_number`,
+															`r_id`
+
+								)
+		values
+		(
+												#{gdId}, 
+															#{dId}, 
+															#{gId}, 
+															#{gdNumber},
+															#{rId}
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.DgrelationshipEntity">
+		update dgrelationship 
+		<set>
+															<if test="dId != null">`d_id` = #{dId}, </if>
+												<if test="gId != null">`g_id` = #{gId}, </if>
+												<if test="gdNumber != null">`gd_number` = #{gdNumber},</if>
+			                                    <if test="rId != null">`r_id` = #{rId}, </if>
+								</set>
+		where gd_id = #{gdId}
+	</update>
+	
+	<delete id="delete">
+		delete from dgrelationship where gd_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from dgrelationship where gd_id in 
+		<foreach item="gdId" collection="array" open="(" separator="," close=")">
+			#{gdId}
+		</foreach>
+	</delete>
+
+</mapper>

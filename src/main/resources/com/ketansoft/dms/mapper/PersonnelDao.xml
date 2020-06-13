@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.PersonnelDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.PersonnelEntity">
+		select a.p_id,a.p_name,a.p_department,a.p_sex,a.p_categroy,a.initiation_time,a.p_phone,a.p_number,b.classion from personnel as a,classion as b where b.id=a.p_categroy and a.p_id = #{value}
+	</select>
+
+	<select id="queryNowList" resultType="com.ketansoft.dms.entity.PersonnelEntity">
+		select a.p_id,p_name,p_sex,p_phone,p_department,p_categroy,classion from personnel as a,dprelationship as b,classion as c where c.id=a.p_categroy and a.p_id=b.p_id and b.status>0 and  b.d_id=#{dId}
+	</select>
+
+	<select id="querySame" resultType="com.ketansoft.dms.entity.PersonnelEntity">
+		select * from personnel where p_name=#{pName} and p_number=#{pNumber}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.PersonnelEntity">
+		select p_id,p_name,p_department,p_sex,p_categroy,initiation_time,p_phone,p_number,classion from personnel as a,classion as b
+		<where>
+		id=p_categroy
+			<if test="pName!=null and pName.trim()!=''">
+			    and p_name like concat('%', #{pName}, '%')
+			</if>
+			<if test="pDepartment!=null and pDepartment.trim()!=''">
+				and p_department like concat('%', #{pDepartment}, '%')
+			</if>
+			<if test="select1!=null">
+				and p_sex=#{select1}
+			</if>
+			<if test="select2!=null">
+				and p_categroy=#{select2}
+			</if>
+		</where>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from personnel 
+	</select>
+
+    <insert id="saveBatch">
+        insert into personnel
+        (
+																			`p_name`, 
+																`p_department`, 
+																`p_sex`, 
+																`initiation_time`, 
+																`p_phone`, 
+																`p_categroy`, 
+																`p_number`
+							        )
+        VALUES
+        <foreach collection ="list" item="com.ketansoft.dms.entity.PersonnelEntity" separator =",">
+		(
+									#{pId}, 
+												#{pName}, 
+												#{pDepartment}, 
+												#{pSex}, 
+												#{initiationTime}, 
+												#{pPhone}, 
+												#{pCategroy}, 
+												#{pNumber}
+					         )
+        </foreach>
+    </insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.PersonnelEntity" useGeneratedKeys="true" keyProperty="pId">
+		insert into personnel
+		(
+																		`p_name`, 
+															`p_department`, 
+															`p_sex`, 
+															`initiation_time`, 
+															`p_phone`, 
+															`p_categroy`, 
+															`p_number`
+								)
+		values
+		(
+																		#{pName}, 
+															#{pDepartment}, 
+															#{pSex}, 
+															#{initiationTime}, 
+															#{pPhone}, 
+															#{pCategroy}, 
+															#{pNumber}
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.PersonnelEntity">
+		update personnel 
+		<set>
+															<if test="pName != null">`p_name` = #{pName}, </if>
+												<if test="pDepartment != null">`p_department` = #{pDepartment}, </if>
+												<if test="pSex != null">`p_sex` = #{pSex}, </if>
+												<if test="initiationTime != null">`initiation_time` = #{initiationTime}, </if>
+												<if test="pPhone != null">`p_phone` = #{pPhone}, </if>
+												<if test="pCategroy != null">`p_categroy` = #{pCategroy}, </if>
+												<if test="pNumber != null">`p_number` = #{pNumber}</if>
+								</set>
+		where p_id = #{pId}
+	</update>
+	
+	<delete id="delete">
+		delete from personnel where p_id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		delete from personnel where p_id in 
+		<foreach item="pId" collection="array" open="(" separator="," close=")">
+			#{pId}
+		</foreach>
+	</delete>
+
+
+</mapper>

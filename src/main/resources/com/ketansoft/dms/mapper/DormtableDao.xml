@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.DormtableDao">
+
+
+    <select id="queryList" resultType="com.ketansoft.dms.entity.DormtableEntity">
+        select distinct a.d_id,a.u_id,a.d_address,a.d_type,a.d_specification,a.d_num,a.d_allnum,a.d_allnum-a.d_num as d_null,a.d_num/a.d_allnum as occupancy_rate,c.use_admin,d.use_unit from dorm as a,use_admin as c,use_unit as d
+
+            <where>
+                a.u_id=c.u_id and a.t_id=d.t_id
+            </where>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+
+    </select>
+
+    <select id="ControlList1" resultType="com.ketansoft.dms.entity.DormtableEntity">
+        select distinct a.d_id,a.u_id,a.d_address,a.d_type,a.d_specification,a.d_num,a.d_allnum,a.d_allnum-a.d_num as d_null,a.d_num/a.d_allnum as occupancy_rate,c.use_admin,d.use_unit from dorm as a,use_admin as c,use_unit as d
+        <where>
+            a.u_id=c.u_id and a.t_id=d.t_id and (a.d_num/a.d_allnum &lt;1 or a.d_num=0) and a.d_type=1
+            <if test="dorm!=null and dorm.trim()!=''">
+                and d_address like concat ('%',#{dorm},'%')
+            </if>
+            <if test="dSpecification!=null">
+                and a.d_specification=#{dSpecification}
+            </if>
+        </where>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+
+    </select>
+
+    <select id="ControlTotal1" resultType="int">
+        select count(*) from dorm as a,use_admin as c,use_unit as d
+        <where>
+            a.u_id=c.u_id and a.t_id=d.t_id and (a.d_num/a.d_allnum &lt;1 or a.d_num=0) and a.d_type=1
+            <if test="dorm!=null and dorm.trim()!=''">
+                and d_address like concat ('%',#{dorm},'%')
+            </if>
+            <if test="dSpecification!=null">
+                and a.d_specification=#{dSpecification}
+            </if>
+        </where>
+    </select>
+
+    <select id="ControlList2" resultType="com.ketansoft.dms.entity.DormtableEntity">
+        select distinct a.d_id,a.u_id,a.d_address,a.d_type,a.d_specification,a.d_num,a.d_allnum,a.d_allnum-a.d_num as d_null,a.d_num/a.d_allnum as occupancy_rate,c.use_admin,d.use_unit from dorm as a,use_admin as c,use_unit as d
+        <where>
+            a.u_id=c.u_id and a.t_id=d.t_id and (a.d_num/a.d_allnum &lt;1 or a.d_num=0) and a.d_type=2
+            <if test="dorm!=null and dorm.trim()!=''">
+                and d_address like concat ('%',#{dorm},'%')
+            </if>
+            <if test="dSpecification!=null">
+                and a.d_specification=#{dSpecification}
+            </if>
+        </where>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+
+    </select>
+
+    <select id="ControlTotal2" resultType="int">
+        select count(*) from dorm as a,use_admin as c,use_unit as d
+        <where>
+            a.u_id=c.u_id and a.t_id=d.t_id and (a.d_num/a.d_allnum &lt;1 or a.d_num=0) and a.d_type=2
+            <if test="dorm!=null and dorm.trim()!=''">
+                and d_address like concat ('%',#{dorm},'%')
+            </if>
+            <if test="dSpecification!=null">
+                and a.d_specification=#{dSpecification}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryTimeList" resultType="com.ketansoft.dms.entity.DormtableEntity">
+		select distinct a.d_id,a.u_id,a.d_address,a.d_type,a.d_specification,a.d_num,a.d_allnum,a.d_allnum-a.d_num as d_null,c.use_admin,a.d_num/a.d_allnum as occupancy_rate,d.use_unit from dorm as a,use_admin as c,use_unit as d ,dprelationship as e where
+		a.u_id=c.u_id and a.t_id=d.t_id and e.check_in_time &gt;=#{bgTime} and e.expected_due_time &lt;=#{endTime} and e.d_id=a.d_id and e.status=1
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+	</select>
+
+    <select id="excelList" resultType="com.ketansoft.dms.entity.DormtableEntity">
+       select a.d_id,a.d_address,a.u_id,a.d_type,a.d_specification,a.d_num,a.d_allnum,a.d_allnum-a.d_num as d_null,c.use_admin,a.d_num/a.d_allnum as occupancy_rate,d.use_unit from dorm as a,use_admin as c,use_unit as d where  a.u_id=c.u_id and a.t_id=d.t_id
+    </select>
+
+    <select id="selectList" resultType="com.ketansoft.dms.entity.DormtableEntity">
+       select a.d_address,a.d_type,a.u_id,a.d_specification,a.d_num,a.d_allnum,a.d_allnum-a.d_num as d_null,c.use_admin,a.d_num/a.d_allnum as occupancy_rate,d.use_unit from dorm as a,use_admin as c,use_unit as d where a.u_id=c.u_id and a.t_id=d.t_id and a.d_id in
+        <foreach item="dId" collection="dIds" open="(" separator="," close=")">
+            #{dId}
+        </foreach>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from dorm as a,use_admin as c,use_unit as d
+        <where>
+           a.u_id=c.u_id and a.t_id=d.t_id
+            <if test="pCategroy!=null">
+                and a.p_categroy=#{pCategroy}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+	<link rel="stylesheet" href="${rc.contextPath}/css/sys/dorm.css">
+	<style>
+		#deptree{
+			border: 2px solid #DDDDDD;
+		}
+		#deptree::-webkit-scrollbar{
+			display: none;
+		}
+	</style>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<!-- 宿舍地址选择菜单 -->
+	<div class="row" id="main-content" style="border:none;">
+		<div class="col-xs-3" id="deptree" style="height:518px;overflow-y: scroll;">
+			<div id="tableMain">
+				<ul id="dormTree" class="ztree1 ztree"></ul>
+			</div>
+		</div>
+		<div class="col-xs-9" id="emptable">
+			<div class="input-group">
+				<input type="hidden">
+				<div class="input-group-btn">
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-default" @click="addVillage"><i class="fa fa-plus" style="color:#007bb6;"></i> 小区</button>
+				&nbsp;<button type="button" class="btn btn-default" @click="addHouse"><i class="fa fa-plus"></i>房屋</button>
+				&nbsp;<button type="button" class="btn  btn-default" @click="update"><i class="fa fa-pencil" style="color: #00a157;"></i>&nbsp;修改</button>
+				&nbsp;<button type="button" class="btn btn-default" @click="del" ><i class="fa fa-trash" style="color: red;"></i> 删除</button>
+				</div>
+			</div>
+			<div class="col-md-12">&nbsp;</div>
+<!-- 小区地址选择菜单 -->
+<div id="AddressLayer" style="display: none;padding:10px;">
+	<ul id="AddressTree" class="ztree"></ul>
+</div>
+<!--信息显示-->
+		<div class="col-md-6">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					使用单位：{{dorm.useUnit}}
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					地址：{{dorm.dAddress}}
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					房屋类型：{{dorm.dType==1?'合并':dorm.dType==2?'拆分':''}}
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					房屋规格：{{dorm.dSpecification==1?'2房一厅':dorm.dSpecification==2?'3房一厅':dorm.dSpecification==3?'4房一厅':''}}
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					现住人数：{{dorm.dNum}}
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					可住人数：{{dorm.dAllnum}}
+				</div>
+			</div>
+		</div>
+			<div class="col-md-6">
+				<div class="col-md-12">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							使用权管理：{{dorm.useAdmin}}&nbsp;&nbsp;
+						</div>
+					</div>
+				</div>
+				<div class="col-md-12">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						房屋面积：{{dorm.dArea}}&nbsp;&nbsp;m2
+					</div>
+				</div>
+				</div>
+		        <div class="col-md-12" v-for="(room,index) in room">
+			     <div class="panel panel-default">
+				<div class="panel-body">
+					<div class="form-group">
+						<span>房间：{{room.roomName}} &nbsp;&nbsp;&nbsp;&nbsp;面积:{{room.roomAera}}&nbsp;&nbsp;m2&nbsp;&nbsp;</span>
+						&nbsp;<button type="button" class="btn btn-default btn-sm" @click="area(index)"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;编辑房间</button>
+						&nbsp;<button type="button" class="btn btn-default btn-sm" @click="charge(index)"><i class="fa fa-jpy" aria-hidden="true"></i>&nbsp;编辑收费项</button>
+					</div>
+				</div>
+			     </div>
+		       </div>
+			</div>
+	</div>
+	</div>
+	<!--添加模态框（Modal） -->
+	<div class="modal fade" id="VModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">{{modaltitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>序号</div>
+							<div class="col-sm-10">
+								<input type="number"  class="form-control" v-model="dorm.orderNum" placeholder="序号"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>小区地址</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control"  v-model="dorm.dAddress" placeholder="小区地址"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"  @click="saveOrUpdateVillage">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<!--添加模态框（Modal） -->
+	<div class="modal fade" id="HModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">{{modaltitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group" id="orderNum">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>序号</div>
+							<div class="col-sm-10">
+								<input type="number"  class="form-control" v-model="dorm.orderNum" placeholder="序号"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="form-group" id="useadmin">
+								<div class="col-sm-2 control-label"><span style="color:red;">*</span>使用权管理</div>
+								<div class="col-sm-10">
+									<select  class="form-control" v-model="dorm.uId" placeholder="使用权管理">
+										<option v-for="useadmin in useAdmin" v-bind:value="useadmin.uId">{{useadmin.useAdmin}}</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>使用单位</div>
+							<div class="col-sm-10">
+								<select  class="form-control" v-model="dorm.tId" placeholder="使用单位">
+									<option v-for="useunit in useUnit" v-bind:value="useunit.tId">{{useunit.useUnit}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group" id="superior">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>小区地址</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" @click="AddressTree" v-model="parentAddress" placeholder="小区地址"/>
+							</div>
+						</div>
+						<div class="form-group" id="address">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>房号</div>
+							<div class="col-sm-10">
+								<input type="text"  class="form-control" v-model="dorm.dAddress" placeholder="房号"/>
+							</div>
+						</div>
+						<div class="form-group"  id="area">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>面积</div>
+							<div class="col-sm-10">
+								<input type="number" class="form-control" v-model="dorm.dArea" placeholder="面积"/>
+							</div>
+						</div>
+						<div class="form-group" id="type">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>类型</div>
+							<div class="col-sm-10">
+								<select type="text"  class="form-control"   v-model="dorm.dType" placeholder="类型">
+									<option value="1">合并</option>
+									<option value="2">拆分</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group" id="specification">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>规格</div>
+							<div class="col-sm-10">
+								<select  class="form-control"  v-model="dorm.dSpecification" placeholder="规格">
+									<option value="1">2房一厅</option>
+									<option value="2">3房一厅</option>
+									<option value="3">4房一厅</option>
+								</select>
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"   @click="saveOrUpdateHouse">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<!--添加模态框（Modal） -->
+	<div class="modal fade" id="RModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">设定房间面积</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group" v-for="room in room">
+							<div class="col-sm-2 control-label">{{room.roomName}}:</div>
+							<div class="col-sm-10">
+								<input type="number"  class="form-control" v-model="room.roomAera" placeholder="房间面积"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"  data-dismiss="modal" @click="saveOrUpdateRoom">确定</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<!--添加模态框（Modal） -->
+	<div class="modal fade" id="ERModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">编辑房间</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-2 control-label">房间名</div>
+							<div class="col-sm-10">
+								<input type="text" disabled="disabled"  class="form-control" v-model="dormRoom.roomName" placeholder="房间名"/>
+							</div>
+						</div>
+					</form>
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-2 control-label">房间面积</div>
+							<div class="col-sm-10">
+								<input type="number"  class="form-control" v-model="dormRoom.roomAera" placeholder="房间面积"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"  data-dismiss="modal" @click="saveOrUpdateERoom">确定</button>
+					<button type="button" class="btn btn-warning"  data-dismiss="modal" >&nbsp;取消</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<div class="modal fade" id="cModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">收费项</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" v-for="cost in costs">
+						<div class="form-group">
+							<div class="col-sm-2 control-label">{{cost.cName}}</div>
+							<div class="col-sm-10">
+								<input type="number" class="form-control" v-model="cost.value" placeholder="金额"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" @click="saveOrUpdateCost">确定</button>
+					<button type="button" class="btn btn-warning"  data-dismiss="modal" >&nbsp;取消</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/dorm_add.js?_${date.systemTime}"></script>
+</body>
+</html>

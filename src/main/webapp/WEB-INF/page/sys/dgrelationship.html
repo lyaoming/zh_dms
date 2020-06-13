@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+	<link rel="stylesheet" href="${rc.contextPath}/css/sys/dorm.css">
+	<style>
+		#deptree::-webkit-scrollbar{
+			display: none;
+		}
+	</style>
+</head>
+<body>
+<div id="rrapp">
+	<div class="col-xs-12" id="main-content" style="border: none;">
+		<div class="col-xs-3" id="deptree" style="height:518px;overflow-y: scroll;border: 2px solid #DDDDDD;">
+			<div id="tableMain">
+				<ul id="dormTree" class="ztree1 ztree"></ul>
+			</div>
+		</div>
+		<div class="col-xs-9" id="emptable">
+			<div class="input-group">
+				<input type="hidden">
+				<div class="input-group-btn">
+				<button class="btn btn-default" @click="add"><i class="fa fa-plus" style="color:#007bb6;"></i>&nbsp;新增</button>
+				<button type="button"  class="btn btn-default" @click="update"><i class="fa fa-pencil" style="color: #00a157;"></i>&nbsp;修改</button>
+				<button type="button" class="btn btn-default" @click="del"><i class="fa fa-trash" style="color: red;"></i>&nbsp;删除</button>
+				</div>
+				</div>
+				<table id="jqGrid"></table>
+				<div id="jqGridPager"></div>
+			</div>
+		</div>
+	<!-- 物品添加模态框（Modal） -->
+	<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">{{modaltitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-2 control-label">房屋号</div>
+							<div class="col-sm-10">
+								<input type="text" disabled="disabled" class="form-control" v-model="dgrelationship.dAddress" placeholder="房屋号"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label">房间</div>
+							<div class="col-sm-10">
+								<select class="form-control" v-model="dgrelationship.rId">
+									<option v-for="room in room" v-bind:value="room.rId">{{room.roomName}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label">物品</div>
+							<div class="col-sm-10">
+								<input type="text" @click="addg" class="form-control" v-model="dgrelationship.gName" placeholder="物品"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"  @click="saveOrUpdate">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+<!-- 物品选择模态框（Modal） -->
+<div class="modal fade" id="gModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" style="width:90%">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">{{modaltitle}}</h4>
+			</div>
+			<div class="modal-body" style="overflow-x: scroll">
+				<div class="grid-btn colxs-12">
+					<div class="form-group col-sm-2">
+						<input type="text" class="form-control" v-model="keyword" @keyup.enter="query" placeholder="搜索......">
+					</div>
+					<button type="button" class="btn btn-default btn-sm" @click="query"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索</button>
+					<button type="button" class="btn btn-primary btn-sm"  @click="select"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;确定</button>
+				</div>
+				<table id="gjqGrid" style="width:100%"></table>
+				<div id="gjqGridPager"></div>
+			</div>
+			<div class="modal-footer">
+				<div class="modal-footer">
+				</div>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+	<!-- 物品添加模态框（Modal） -->
+	<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">{{modaltitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-2 control-label">房屋号</div>
+							<div class="col-sm-10">
+								<input type="text" disabled="disabled" class="form-control" v-model="dgrelationship.dAddress" placeholder="房屋号"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label">房间</div>
+							<div class="col-sm-10">
+								<select class="form-control" v-model="dgrelationship.rId">
+									<option v-for="room in room" v-bind:value="room.rId">{{room.roomName}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label">物品</div>
+							<div class="col-sm-10">
+								<input type="text" @click="addg" class="form-control" v-model="dgrelationship.gName" placeholder="物品"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label">房屋物品数量</div>
+							<div class="col-sm-10">
+								<input type="number" class="form-control" v-model="dgrelationship.gdNumber" placeholder="房屋物品数量"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"  @click="saveOrUpdate">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+</div>
+<script src="${rc.contextPath}/js/sys/dgrelationship.js?_${date.systemTime}"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp">
+	<div class="input-group" style="margin-left:0.5%">
+		<input type="hidden">
+		<div class="input-group-btn">
+			<button class="btn btn-default" @click="add"><i class="fa fa-plus" style="color:#007bb6;"></i>&nbsp;新增</button>
+			<button type="button"  class="btn btn-default" @click="update"><i class="fa fa-pencil" style="color: #00a157;"></i>&nbsp;修改</button>
+			<button type="button" class="btn btn-default" @click="del"><i class="fa fa-trash" style="color: red;"></i>&nbsp;删除</button>
+		</div>
+	</div>
+    <table id="jqGrid"></table>
+    <div id="jqGridPager"></div>
+	<!-- 添加模态框（Modal） -->
+	<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">{{modaltitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>收费项</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" v-model="cost.cName" placeholder="收费项"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label">新增时间:</div>
+							<div class="col-sm-10">
+								<input type="text" disabled="disabled" class="form-control" v-model="cost.addTime" placeholder="操作时间"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label">操作人员</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" disabled="disabled" v-model="cost.addName" placeholder="操作人员"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"  @click="saveOrUpdate">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/cost.js?_${date.systemTime}"></script>
+</body>
+</html>

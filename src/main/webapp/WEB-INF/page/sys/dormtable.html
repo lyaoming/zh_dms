@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp">
+	<div class="input-group">
+			<input type="text" style="width: 50%;" class="form-control" id="dbgTime"  placeholder="开始时间">
+			<input type="text" style="width: 50%;" class="form-control" id="dendTime" placeholder="截止时间">
+		<div class="input-group-btn">
+			<button type="button" class="btn btn-default" @click="search"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索
+			</button>
+			<button type="button" class="btn btn-default" @click="exportdate"><i class="fa fa-upload" aria-hidden="true" style="color:green;"></i> &nbsp;全部导出
+			</button>
+			<button type="button" class="btn btn-default" @click="selectexport"><i class="fa fa-upload" aria-hidden="true" style="color:orange;"></i> &nbsp;导出选中
+			</button>
+			<button type="button" class="btn btn-default" @click="classexport"><i class="fa fa-upload" aria-hidden="true" style="color:steelblue;"></i> &nbsp;导出查询
+			</button>
+		</div>
+	</div>
+	<div class="col-md-12">
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="col-md-2">&nbsp;</div>
+			<div class="col-md-2" style="font-size: 16px;font-weight: bold">总房间数：{{showdata.sum}}</div>
+			<div class="col-md-2" style="font-size: 16px;font-weight: bold">总入住数：{{showdata.nownum}}</div>
+			<div class="col-md-2" style="font-size: 16px;font-weight: bold">总空房数：{{showdata.nullnum}}</div>
+			<div class="col-md-2" style="font-size: 17px;font-weight: bold">总入住率：{{showdata.reta+"%"}}</div>
+			<div class="col-md-2">&nbsp;</div>
+		</div>
+	</div>
+	</div>
+    <table id="jqGrid"></table>
+    <div id="jqGridPager"></div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/dormtable.js?_${date.systemTime}"></script>
+<script src="${rc.contextPath}/statics/plugins/layui/layui.js?_${date.systemTime}"></script>
+<script>
+	layui.use('laydate', function() {
+		var laydate = layui.laydate;
+
+		//执行一个laydate实例
+		//执行一个laydate实例
+		laydate.render({
+			elem: '#dbgTime',//指定元素
+			eventElem: '#dbgTime-1',
+			event: 'click',
+			type: 'date',
+		});
+		laydate.render({
+			elem: '#dendTime',//指定元素
+			eventElem: '#dendTime-1',
+			event: 'click',
+			type: 'date',
+		});
+	});
+</script>
+</body>
+</html>

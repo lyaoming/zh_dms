@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.CostDao">
+
+	<select id="queryRecordList" resultType="com.ketansoft.dms.entity.ExpensetableEntity">
+		select d.pd_id,a.p_id,a.p_name,a.p_department,a.p_categroy,b.d_address,d.check_in_time,d.expected_due_time,d.leave_time from personnel as a,dorm as b, dprelationship as d
+		<where>
+			a.p_id=d.p_id and b.d_id=d.d_id
+			<if test="pCategroy!=null">
+				and a.p_categroy=#{pCategroy}
+			</if>
+			<if test="pDepartment!=null and pDepartment.trim()!=''">
+				and a.p_department=#{pDepartment}
+			</if>
+		</where>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.CostEntity">
+		select * from cost where c_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.CostEntity">
+		select * from cost
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from cost 
+	</select>
+
+	<insert id="saveBatch">
+		insert into cost
+		(
+		`c_name`,
+		`add_time`,
+		`add_name`
+		)
+		VALUES
+		<foreach collection ="list" item="com.ketansoft.dms.entity.CostEntity" separator =",">
+			(
+			#{cId},
+			#{cName},
+			#{addTime},
+			#{addName}
+			)
+		</foreach>
+	</insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.CostEntity" useGeneratedKeys="true" keyProperty="cId">
+		insert into cost
+		(
+																		`c_name`,
+															`add_time`,
+															`add_name`
+								)
+		values
+		(
+																		#{cName},
+															#{addTime},
+															#{addName}
+								)
+	</insert>
+
+	<update id="update" parameterType="com.ketansoft.dms.entity.CostEntity">
+		update cost
+		<set>
+			<if test="cName != null">`c_name` = #{cName}, </if>
+			<if test="addTime != null">`add_time` = #{addTime}, </if>
+			<if test="addName != null">`add_name` = #{addName}</if>
+		</set>
+		where c_id = #{cId}
+	</update>
+
+	<delete id="delete">
+		delete from cost where c_id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		delete from cost where c_id in
+		<foreach item="cId" collection="array" open="(" separator="," close=")">
+			#{cId}
+		</foreach>
+	</delete>
+
+
+</mapper>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div class="panel panel-default" id="rrapp" v-cloak>
+	<div class="panel-heading">{{title}}</div>
+	<form class="form-horizontal">
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">人员类型</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="classion.classion" placeholder="人员类型"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">添加时间</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="classion.addTime" placeholder="添加时间"/>
+		    </div>
+		</div>
+		<div class="form-group">
+		   	<div class="col-sm-2 control-label">操作人员</div>
+		   	<div class="col-sm-10">
+		      <input type="text" class="form-control" v-model="classion.addName" placeholder="操作人员"/>
+		    </div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-2 control-label"></div> 
+			<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+			&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="back" value="返回"/>
+		</div>
+	</form>
+</div>
+
+<script src="${rc.contextPath}/js/sys/classion_add.js?_${date.systemTime}"></script>
+</body>
+</html>

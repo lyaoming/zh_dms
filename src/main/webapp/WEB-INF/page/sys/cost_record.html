@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp">
+	<div class="grid-btn">
+		<div class="form-group col-sm-2">
+			<div class="input-group"><!--保持内联，消除边框，类似于form-inline-->
+				<div class="input-group-btn"><!--不换行，与相邻元素内联，包含dropdown-->
+					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+						<span style="font-size: 14.5px;">请选择</span><span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li v-for="(dpm,index) in department"><a @click="searchDpm(index)">{{dpm.dpmName}}</a></li>
+					</ul>
+				</div>
+				<input type="text" class="form-control"  v-model="pDepartment" placeholder="部室" />
+			</div>
+		</div>
+		<div class="form-group col-sm-2">
+			<select class="form-control" v-model="pCategroy" >
+				<option value=" "></option>
+			     <option value="1">交流干部</option>
+				 <option value="2">借调人员</option>
+				 <option value="3">新员工</option>
+			</select>
+		</div>
+		<button type="button" class="btn btn-default btn-sm" @click="search"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索</button>
+	</div>
+    <table id="jqGrid"></table>
+    <div id="jqGridPager"></div>
+</div>
+<script src="${rc.contextPath}/js/sys/cost_record.js?_${date.systemTime}"></script>
+</body>
+</html>

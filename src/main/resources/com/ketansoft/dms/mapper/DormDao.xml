@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.DormDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.DormEntity">
+		select * from dorm where d_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.DormEntity">
+		select * from dorm
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+		<choose>
+			<otherwise>order by order_num</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryTotal" resultType="int">
+		select count(*) from dorm
+	</select>
+
+    <insert id="saveBatch">
+        insert into dorm
+        (
+		                                                        `u_id`,
+																`parent_id`,
+																`d_address`, 
+																`d_area`, 
+																`d_specification`, 
+																`d_type`, 
+																`d_num`, 
+																`d_allnum`, 
+																`order_num`, 
+																`d_superior_address`,
+		                                                        `t_id`
+
+							        )
+        VALUES
+        <foreach collection ="list" item="com.ketansoft.dms.entity.DormEntity" separator =",">
+		(
+									#{uId},
+												#{parentId}, 
+												#{dAddress}, 
+												#{dArea}, 
+												#{dSpecification}, 
+												#{dType}, 
+												#{dNum}, 
+												#{dAllnum}, 
+												#{orderNum}, 
+												#{dSuperiorAddress},
+			                                    #{tId}
+					         )
+        </foreach>
+    </insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.DormEntity" useGeneratedKeys="true" keyProperty="dId">
+		insert into dorm
+		(
+																	 `u_id`,
+																	`parent_id`,
+																`d_address`,
+																`d_area`,
+																`d_specification`,
+																`d_type`,
+																`d_num`,
+																`d_allnum`,
+																`order_num`,
+																`d_superior_address`,
+		                                                        `t_id`
+								)
+		values
+		(
+
+												#{uId},
+												#{parentId},
+												#{dAddress},
+												#{dArea},
+												#{dSpecification},
+												#{dType},
+												#{dNum},
+												#{dAllnum},
+												#{orderNum},
+												#{dSuperiorAddress},
+			                                    #{tId}
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.DormEntity">
+		update dorm 
+		<set>
+			                                    <if test="uId != null">`u_id` = #{uId}, </if>
+			                                    <if test="parentId != null">`parent_id` = #{parentId}, </if>
+												<if test="dAddress != null">`d_address` = #{dAddress}, </if>
+												<if test="dArea != null">`d_area` = #{dArea}, </if>
+												<if test="dSpecification != null">`d_specification` = #{dSpecification}, </if>
+												<if test="dType != null">`d_type` = #{dType}, </if>
+												<if test="dNum != null">`d_num` = #{dNum}, </if>
+												<if test="dAllnum != null">`d_allnum` = #{dAllnum}, </if>
+												<if test="orderNum != null">`order_num` = #{orderNum}, </if>
+												<if test="dSuperiorAddress != null">`d_superior_address` = #{dSuperiorAddress},</if>
+			                                    <if test="tId != null">`t_id` = #{tId} </if>
+								</set>
+		where d_id = #{dId}
+	</update>
+	<update id="add">
+		update dorm set `d_num`=`d_num`+1 where d_id=#{dId} and `d_num` &lt; `d_allnum`
+
+	</update>
+
+	<update id="reduce">
+		update dorm set `d_num`=`d_num`-1 where d_id=#{BdId} and 0 &lt; `d_num`
+	</update>
+	
+
+	<update id="deletep">
+		update dorm as a,dprelationship as b, personnel as c set a.d_num=a.d_num-1 where a.d_num &gt;0 and a.d_id=b.d_id and c.p_id=b.p_id and c.p_id=#{pId}
+	</update>
+
+	<delete id="delete">
+		delete a,b from dorm as a left join dorm as b on a.d_id=b.parent_id where a.d_id = #{value}
+	</delete>
+
+	
+	<delete id="deleteBatch">
+		delete a,b from dorm as a left join dorm as b on a.d_id=b.parent_id where a.d_id in
+		<foreach item="dId" collection="array" open="(" separator="," close=")">
+			#{dId}
+		</foreach>
+	</delete>
+
+</mapper>

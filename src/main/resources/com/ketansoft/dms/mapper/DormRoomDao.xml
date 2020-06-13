@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.DormRoomDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.DormRoomEntity">
+		select * from dorm_room where p_id = #{value}
+	</select>
+
+	<select id="queryObjectG" resultType="com.ketansoft.dms.entity.DormRoomEntity">
+		select * from dorm_room where  r_id =#{value}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.DormRoomEntity">
+		select * from dorm_room where status &gt;0 and parent_id=#{parentId}
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="updateList" resultType="com.ketansoft.dms.entity.DormRoomEntity">
+		select * from dorm_room where parent_id=#{parentId}
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from dorm_room 
+	</select>
+
+    <insert id="saveBatch">
+        insert into dorm_room
+        (
+
+																`parent_id`, 
+																`room_name`, 
+																`p_id`, 
+																`room_aera`
+							        )
+        VALUES
+        <foreach collection ="list" item="com.ketansoft.dms.entity.DormRoomEntity" separator =",">
+		(
+
+												#{parentId}, 
+												#{roomName}, 
+												#{pId}, 
+												#{roomAera}
+					         )
+        </foreach>
+    </insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.DormRoomEntity" useGeneratedKeys="true" keyProperty="rId">
+		insert into dorm_room
+		(
+
+															`parent_id`, 
+															`room_name`, 
+															`p_id`, 
+															`room_aera`,
+															`status`
+								)
+		values
+		(
+
+															#{parentId}, 
+															#{roomName}, 
+															#{pId}, 
+															#{roomAera},
+															#{status}
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.DormRoomEntity">
+		update dorm_room 
+		<set>
+			`p_id` = #{pId},
+															<if test="parentId != null">`parent_id` = #{parentId}, </if>
+												<if test="roomName != null">`room_name` = #{roomName}, </if>
+
+												<if test="roomAera != null">`room_aera` = #{roomAera},</if>
+			                                   <if test="status != null">`status` = #{status}</if>
+								</set>
+		where r_id = #{rId}
+	</update>
+	
+	<delete id="delete">
+		delete from dorm_room where parent_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from dorm_room where r_id in
+		<foreach item="rId" collection="array" open="(" separator="," close=")">
+			#{rId}
+		</foreach>
+	</delete>
+
+</mapper>

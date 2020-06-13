@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.DprelationshipDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.DprelationshipEntity">
+		select pd_id,a.p_id,a.d_id,check_in_time,expected_due_time,deposit,deposit_money,status,p_name,d_address,a.r_id from dprelationship as a,personnel as b,dorm as d where a.p_id=b.p_id and a.d_id=d.d_id and pd_id = #{value}
+	</select>
+
+
+	<select id="queryObjectStatus" resultType="com.ketansoft.dms.entity.DprelationshipEntity">
+		select * from dprelationship where status=0 and pd_id in
+		<foreach item="pdId" collection="pdIds" open="(" separator="," close=")">
+		 #{pdId}
+	    </foreach>
+	</select>
+
+	<select id="querySameList" resultType="com.ketansoft.dms.entity.DprelationshipEntity">
+		select * from dprelationship where status &gt;0 and p_id= #{pId} and check_in_time=#{bgTime}
+	</select>
+
+	<select id="findPersonnel" resultType="com.ketansoft.dms.entity.DprelationshipEntity">
+		select p_id from dprelationship where status &gt;0;
+	</select>
+
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.DprelationshipEntity">
+		select pd_id,a.p_id,a.d_id,check_in_time,expected_due_time,deposit,deposit_money,status,p_name,d_address,leave_time,a.r_id from dprelationship as a,personnel as b,dorm as d
+		<where>
+		   a.p_id=b.p_id and a.d_id=d.d_id and a.status &gt;0
+		   <if test="keyword!=null and keyword.trim()!=''">
+			   and p_name like concat ('%',#{keyword},'%')
+		   </if>
+			<if test="dorm!=null and dorm.trim()!=''">
+				and d_address like concat ('%',#{dorm},'%')
+			</if>
+			<if test="sbgTime!=null and sbgTime.trim()!=''">
+				and  check_in_time &gt;= #{sbgTime}
+			</if>
+			<if test="sendTime!=null and sendTime.trim()!=''">
+				and  check_in_time &lt;= #{sendTime}
+			</if>
+		</where>
+		<choose>
+		<otherwise>order by a.status desc</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryTotal" resultType="int">
+		select count(*) from dprelationship as a,personnel as b,dorm as d where a.p_id=b.p_id and a.d_id=d.d_id and a.status &gt;0
+	</select>
+
+
+	<select id="queryRetreateList" resultType="com.ketansoft.dms.entity.DprelationshipEntity">
+		select pd_id,a.p_id,a.d_id,expected_due_time,status,p_name,d_address,leave_time,a.r_id from dprelationship as a,personnel as b,dorm as d
+		<where>
+			a.p_id=b.p_id and a.d_id=d.d_id and a.status &gt;0
+			<if test="keyword!=null and keyword.trim()!=''">
+				and p_name like concat ('%',#{keyword},'%')
+			</if>
+			<if test="dorm!=null and dorm.trim()!=''">
+				and d_address like concat ('%',#{dorm},'%')
+			</if>
+			<if test="sbgTime!=null and sbgTime.trim()!=''">
+				and  expected_due_time &gt;= #{sbgTime}
+			</if>
+			<if test="sendTime!=null and sendTime.trim()!=''">
+				and  expected_due_time&lt;= #{sendTime}
+			</if>
+		</where>
+		<choose>
+			<otherwise>order by a.status desc</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+
+	<select id="queryRecordList" resultType="com.ketansoft.dms.entity.DprelationshipEntity">
+		select pd_id,a.p_id,a.d_id,check_in_time,expected_due_time,deposit,deposit_money,status,p_name,d_address,leave_time,a.r_id from dprelationship as a,personnel as b,dorm as d
+		<where>
+			a.p_id=b.p_id and a.d_id=d.d_id and a.status =0
+			<if test="pName!=null and pName.trim()!=''">
+				and p_name like concat ('%',#{pName},'%')
+			</if>
+			<if test="dorm!=null and dorm.trim()!=''">
+				and d_address like concat ('%',#{dorm},'%')
+			</if>
+			<if test="sbgTime!=null and sbgTime.trim()!=''">
+				and  leave_time &gt;= #{sbgTime}
+			</if>
+			<if test="sendTime!=null and sendTime.trim()!=''">
+				and  leave_time &lt;= #{sendTime}
+			</if>
+			<if test="deposit!=null">
+				and deposit = #{deposit}
+			</if>
+		</where>
+		<choose>
+			<otherwise>order by a.status desc</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryRecordTotal" resultType="int">
+		select count(*) from dprelationship as a,personnel as b,dorm as d where a.p_id=b.p_id and a.d_id=d.d_id and a.status =0
+	</select>
+
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.DprelationshipEntity" useGeneratedKeys="true" keyProperty="pdId">
+		insert into dprelationship
+		(
+																		`p_id`, 
+															`d_id`,
+															`r_id`,
+															`check_in_time`,
+															`expected_due_time`, 
+															`deposit`, 
+															`deposit_money`, 
+															`status`,
+															`leave_time`
+
+								)
+		values
+		(
+																		#{pId}, 
+															#{dId},
+															#{rId},
+															#{checkInTime},
+															#{expectedDueTime},
+															#{deposit}, 
+															#{depositMoney}, 
+															#{status},
+															#{leaveTime}
+
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.DprelationshipEntity">
+		update dprelationship 
+		<set>
+															<if test="pId != null">`p_id` = #{pId}, </if>
+												<if test="dId != null">`d_id` = #{dId}, </if>
+												<if test="rId!=null">`r_id`=#{rId},</if>
+											    <if test="checkInTime != null">`check_in_time` = #{checkInTime}, </if>
+												<if test="expectedDueTime != null">`expected_due_time` = #{expectedDueTime}, </if>
+												<if test="deposit != null">`deposit` = #{deposit}, </if>
+												<if test="depositMoney != null">`deposit_money` = #{depositMoney}, </if>
+												<if test="status != null">`status` = #{status}</if>
+
+								</set>
+		where pd_id = #{pdId}
+	</update>
+
+	<update id="leave">
+		update dprelationship as a,dorm as b,record as d set a.status=0,d.status=0,b.d_num=b.d_num-#{len},a.leave_time=#{leaveTime} where b.d_num &gt;=#{len} and a.d_id=b.d_id and d.p_id=a.p_id and a.status &gt;0 and a.p_id in
+		<foreach item="pId" collection="pIds" open="(" separator="," close=")">
+			#{pId}
+	   </foreach>
+	</update>
+
+	<update id="leaveSelect">
+		update dprelationship as a,dorm as b,record as d set a.status=0,d.status=0,b.d_num=b.d_num-1,a.leave_time=#{leaveTime} where b.d_num &gt;0 and a.d_id=b.d_id  and a.p_id=d.p_id and  a.status &gt;0  and a.pd_id=#{pdId}
+	</update>
+
+	<delete id="delete">
+		delete from dprelationship where pd_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from dprelationship  where status &lt;1 and pd_id in
+		<foreach item="pdId" collection="array" open="(" separator="," close=")">
+			#{pdId}
+		</foreach>
+	</delete>
+
+	<select id="exportSelect" resultType="com.ketansoft.dms.entity.DprelationshipEntity">
+		select pd_id,a.p_id,a.d_id,check_in_time,expected_due_time,deposit,deposit_money,status,p_name,d_address,leave_time,a.r_id from dprelationship as a,personnel as b,dorm as d
+		where a.p_id=b.p_id and a.d_id=d.d_id and a.status =0 and a.pd_id in
+		<foreach item="pdId" collection="array" open="(" separator="," close=")">
+			#{pdId}
+		</foreach>
+	</select>
+</mapper>

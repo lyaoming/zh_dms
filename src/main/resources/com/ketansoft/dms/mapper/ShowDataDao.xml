@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.ShowDataDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.ShowDataEntity">
+		select * from show_data where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.ShowDataEntity">
+		select entry_num,retreate_num,warning_num from show_data
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from show_data 
+	</select>
+
+    <insert id="saveBatch">
+        insert into show_data
+        (
+												`id`, 
+																`entry_num`, 
+																`retreate_num`, 
+																`warning_num`
+							        )
+        VALUES
+        <foreach collection ="list" item="com.ketansoft.dms.entity.ShowDataEntity" separator =",">
+		(
+									#{id}, 
+												#{entryNum}, 
+												#{retreateNum}, 
+												#{warningNum}
+					         )
+        </foreach>
+    </insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.ShowDataEntity">
+		insert into show_data
+		(
+												`id`, 
+															`entry_num`, 
+															`retreate_num`, 
+															`warning_num`
+								)
+		values
+		(
+												#{id}, 
+															#{entryNum}, 
+															#{retreateNum}, 
+															#{warningNum}
+								)
+	</insert>
+	 
+	<update id="add" parameterType="com.ketansoft.dms.entity.ShowDataEntity">
+		update show_data 
+		<set>
+															<if test="entryNum != null">`entry_num` =`entry_num`+1, </if>
+												<if test="retreateNum != null">`retreate_num` = `retreate_num`+1, </if>
+												<if test="warningNum != null">`warning_num` = `retreate_num`+1</if>
+								</set>
+		where id =1
+	</update>
+	
+	<delete id="delete">
+		delete from show_data where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from show_data where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

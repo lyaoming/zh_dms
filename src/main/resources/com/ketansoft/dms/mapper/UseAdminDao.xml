@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.UseAdminDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.UseAdminEntity">
+		select * from use_admin where u_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.UseAdminEntity">
+		select * from use_admin 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from use_admin 
+	</select>
+
+    <insert id="saveBatch">
+        insert into use_admin
+        (
+
+																`use_admin`, 
+																`add_time`, 
+																`add_name`
+							        )
+        VALUES
+        <foreach collection ="list" item="com.ketansoft.dms.entity.UseAdminEntity" separator =",">
+		(
+
+												#{useAdmin}, 
+												#{addTime}, 
+												#{addName}
+					         )
+        </foreach>
+    </insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.UseAdminEntity">
+		insert into use_admin
+		(
+
+															`use_admin`, 
+															`add_time`, 
+															`add_name`
+								)
+		values
+		(
+
+															#{useAdmin}, 
+															#{addTime}, 
+															#{addName}
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.UseAdminEntity">
+		update use_admin 
+		<set>
+															<if test="useAdmin != null">`use_admin` = #{useAdmin}, </if>
+												<if test="addTime != null">`add_time` = #{addTime}, </if>
+												<if test="addName != null">`add_name` = #{addName}</if>
+								</set>
+		where u_id = #{uId}
+	</update>
+	
+	<delete id="delete">
+		delete from use_admin where u_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from use_admin where u_id in 
+		<foreach item="uId" collection="array" open="(" separator="," close=")">
+			#{uId}
+		</foreach>
+	</delete>
+
+</mapper>

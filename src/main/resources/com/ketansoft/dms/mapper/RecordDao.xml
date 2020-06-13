@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.RecordDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.RecordEntity">
+		select * from record where record_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.RecordEntity">
+		select * from record 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="findSame" resultType="com.ketansoft.dms.entity.RecordEntity">
+		select * from record where p_id=#{pId} and record_month=#{month} and record_year=#{year} and status &gt;0;
+	</select>
+
+
+	<select id="costList" resultType="com.ketansoft.dms.entity.CostItemEntity">
+		select a.c_id,a.value,b.c_name from cprelationship as a, cost as b where a.c_id=b.c_id and a.p_id=#{pId} and status &gt;0
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from record 
+	</select>
+
+    <insert id="saveBatch">
+        insert into record
+        (
+
+																`p_id`, 
+																`p_name`, 
+																`dorm`, 
+																`p_categroy`, 
+																`p_department`, 
+																`cost_items`, 
+																`record_month`, 
+																`record_year`,
+		                                                         `status`
+							        )
+        VALUES
+        <foreach collection ="list" item="com.ketansoft.dms.entity.RecordEntity" separator =",">
+		(
+
+												#{pId}, 
+												#{pName}, 
+												#{dorm}, 
+												#{pCategroy}, 
+												#{pDepartment}, 
+												#{costItems}, 
+												#{recordMonth}, 
+												#{recordYear},
+												#{status}
+					         )
+        </foreach>
+    </insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.RecordEntity">
+		insert into record
+		(
+
+															`p_id`, 
+															`p_name`, 
+															`dorm`, 
+															`p_categroy`, 
+															`p_department`, 
+															`cost_items`, 
+															`record_month`, 
+															`record_year`,
+															`status`
+								)
+		values
+		(
+
+															#{pId}, 
+															#{pName}, 
+															#{dorm}, 
+															#{pCategroy}, 
+															#{pDepartment}, 
+															#{costItems}, 
+															#{recordMonth}, 
+															#{recordYear},
+															#{status}
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.RecordEntity">
+		update record 
+		<set>
+															<if test="pId != null">`p_id` = #{pId}, </if>
+												<if test="pName != null">`p_name` = #{pName}, </if>
+												<if test="dorm != null">`dorm` = #{dorm}, </if>
+												<if test="pCategroy != null">`p_categroy` = #{pCategroy}, </if>
+												<if test="pDepartment != null">`p_department` = #{pDepartment}, </if>
+												<if test="costItems != null">`cost_items` = #{costItems}, </if>
+												<if test="recordMonth != null">`record_month` = #{recordMonth}, </if>
+												<if test="recordYear != null">`record_year` = #{recordYear},</if>
+			                                    <if test="status != null">`status` = #{status} </if>
+								</set>
+		where p_id = #{pId} and record_month=#{recordMonth} and record_year=#{recordYear} and status &gt;0
+	</update>
+	
+	<delete id="delete">
+		delete from record where record_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from record where record_id in 
+		<foreach item="recordId" collection="array" open="(" separator="," close=")">
+			#{recordId}
+		</foreach>
+	</delete>
+
+</mapper>

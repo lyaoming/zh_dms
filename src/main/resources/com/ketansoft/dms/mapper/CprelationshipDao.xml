@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.CprelationshipDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.CprelationshipEntity">
+		select * from cprelationship where r_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.CprelationshipEntity">
+		select a.id,a.c_id,a.r_id,a.value,b.c_name from cprelationship as a, cost as b where a.c_id=b.c_id and a.p_id=#{pId} and status &gt;0
+	</select>
+
+	<select id="edqueryList" resultType="com.ketansoft.dms.entity.CprelationshipEntity">
+		select a.id,a.c_id,a.r_id,a.value,b.c_name from cprelationship as a, cost as b where r_id=#{rId} and a.c_id=b.c_id
+	</select>
+
+	<select id="queryRecordList" resultType="com.ketansoft.dms.entity.CprelationshipEntity">
+		select a.id,a.c_id,a.value,b.c_name from cprelationship as a, cost as b
+		<where> a.c_id=b.c_id and p_id=#{pId}
+			<if test="bgTime!=null">
+				and bg_time=#{bgTime}
+			</if>
+			<if test="endTime!=null">
+				and end_time=#{endTime}
+			</if>
+		</where>
+	</select>
+
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from cprelationship 
+	</select>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.CprelationshipEntity">
+		insert into cprelationship
+		(
+												`p_id`, 
+															`c_id`,
+															`r_id`,
+															`value`,
+															`status`,
+															`bg_time`,
+															`end_time`
+
+								)
+		values
+		(
+												            #{pId},
+															#{cId},
+															#{rId},
+															#{value},
+															#{status},
+															#{bgTime},
+															#{endTime}
+
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.CprelationshipEntity">
+		update cprelationship 
+		<set>
+			                                    `bg_time`=#{bgTime},`end_time`=#{endTime},
+			                                    <if test="flag!=0"> `p_id` = #{pId},</if>
+												<if test="cId != null">`c_id` = #{cId}, </if>
+			                                    <if test="rId != null">`r_id` = #{rId}, </if>
+												<if test="value != null">`value` = #{value},</if>
+			                                    <if test="status != null">`status` = #{status}</if>
+
+								</set>
+		where id = #{id}
+	</update>
+
+	<update id="leave">
+		update cprelationship as a,dprelationship as b set a.status=0 where a.p_id=b.p_id and a.status &gt;0 and b.p_id in
+		<foreach item="pId" collection="pIds" open="(" separator="," close=")">
+			#{pId}
+		</foreach>
+	</update>
+
+	<update id="leaveSelect">
+		update cprelationship as a,dprelationship as b set a.status=0 where a.p_id=b.p_id and a.status &gt;0 and b.pd_id in
+		<foreach item="pdId" collection="pdIds" open="(" separator="," close=")">
+			#{pdId}
+		</foreach>
+	</update>
+	
+	<delete id="delete">
+		delete from cprelationship where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from cprelationship where p_id in 
+		<foreach item="pId" collection="array" open="(" separator="," close=")">
+			#{pId}
+		</foreach>
+	</delete>
+
+</mapper>

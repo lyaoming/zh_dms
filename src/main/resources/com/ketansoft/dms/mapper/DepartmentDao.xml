@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.DepartmentDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.DepartmentEntity">
+		select * from department where dpm_id = #{value}
+	</select>
+	<select id="querySameName" resultType="com.ketansoft.dms.entity.DepartmentEntity">
+		select * from department where dpm_name=#{dpmName}
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryList" resultType="com.ketansoft.dms.entity.DepartmentEntity">
+		select * from department 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from department 
+	</select>
+
+    <insert id="saveBatch">
+        insert into department
+        (
+																			`dpm_name`, 
+																`add_time`, 
+																`add_name`
+							        )
+        VALUES
+        <foreach collection ="list" item="com.ketansoft.dms.entity.DepartmentEntity" separator =",">
+		(
+									#{dpmId}, 
+												#{dpmName}, 
+												#{addTime}, 
+												#{addName}
+					         )
+        </foreach>
+    </insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.DepartmentEntity" useGeneratedKeys="true" keyProperty="dpmId">
+		insert into department
+		(
+																		`dpm_name`, 
+															`add_time`, 
+															`add_name`
+								)
+		values
+		(
+																		#{dpmName}, 
+															#{addTime}, 
+															#{addName}
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.DepartmentEntity">
+		update department 
+		<set>
+															<if test="dpmName != null">`dpm_name` = #{dpmName}, </if>
+												<if test="addTime != null">`add_time` = #{addTime}, </if>
+												<if test="addName != null">`add_name` = #{addName}</if>
+								</set>
+		where dpm_id = #{dpmId}
+	</update>
+	
+	<delete id="delete">
+		delete from department where dpm_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from department where dpm_id in 
+		<foreach item="dpmId" collection="array" open="(" separator="," close=")">
+			#{dpmId}
+		</foreach>
+	</delete>
+
+</mapper>

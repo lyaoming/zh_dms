@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div  id="rrapp" v-cloak>
+	<div class="input-group">
+			<input type="text" style="width: 25%;" class="form-control" v-model="dpkeyword" @keyup.enter="querydp" placeholder="名字">
+			<input type="text" style="width: 25%;" class="form-control" v-model="dpdorm" @keyup.enter="querydp" placeholder="房屋号">
+			<input type="text" style="width: 25%;" class="form-control" id="sbgTime" @keyup.enter="querydp" placeholder="开始时间">
+			<input type="text" style="width: 25%;" class="form-control" id="sendTime" @keyup.enter="querydp" placeholder="截止时间">
+		<div class="input-group-btn">
+		<button type="button" class="btn btn-default" @click="querydp"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索</button>
+		<button type="button"  class="btn btn-default" @click="Continute"><i class="fa fa-sign-in" aria-hidden="true" style="color: #00a157;"></i>&nbsp;续租</button>
+		<button type="button"  class="btn btn-default" @click="Rentreate"><i class="fa fa-sign-out" aria-hidden="true" style="color: red;"></i>&nbsp;退租</button>
+	</div>
+	</div>
+	<table id="jqGrid"></table>
+	<div id="jqGridPager"></div>
+	<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">{{modaltitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>到期时间</div>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="endTime" v-model="dprelationship.expectedDueTime" placeholder='预期到期时间'/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"  data-dismiss="modal" @click="saveOrUpdate">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/sys/dprelationship_rentreate.js?_${date.systemTime}"></script>
+<script src="${rc.contextPath}/statics/plugins/layui/layui.js?_${date.systemTime}"></script>
+<script>
+	layui.use('laydate', function() {
+		var laydate = layui.laydate;
+
+		laydate.render({
+			elem: '#sendTime' ,
+			eventElem: '#sendTime-1',
+			event:'click',
+			type:'date'
+		});
+
+		laydate.render({
+			elem: '#sbgTime' ,
+			eventElem: '#sbgTime-1',
+			type:'date'
+		});
+	});
+</script>
+
+</body>
+</html>

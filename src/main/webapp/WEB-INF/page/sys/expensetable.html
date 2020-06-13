@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    #parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div class="input-group">
+            <div class="input-group-btn"><!--不换行，与相邻元素内联，包含dropdown-->
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span style="font-size: 14.5px;">请选择</span><span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li v-for="(dpm,index) in department"><a @click="searchDpm(index)">{{dpm.dpmName}}</a></li>
+                </ul>
+            </div>
+            <input type="text" style="width:33.33%;" class="form-control" v-model="pDepartment" placeholder="部室"
+                   @keyup.enter="query">
+            <select type="text" style="width:33.33%;" class="form-control" v-model="pCategroy" @change="search">
+                <option v-for="classions in classion" v-bind:value="classions.id">{{classions.classion}}</option>
+            </select>
+            <select class="form-control" style="width:33.33%;" v-model="searchTime" @change="search">
+                <option value="0">&nbsp;</option>
+                <option v-for="months in month" v-bind:value="months.mId">{{months.yName}}年{{months.mName}}月</option>
+            </select>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default" @click="search"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索
+                </button>
+                <button type="button" class="btn btn-default" @click="exportdate"><i class="fa fa-upload" aria-hidden="true" style="color:green;"></i> &nbsp;全部导出
+                </button>
+                <button type="button" class="btn btn-default" @click="selectexport"><i class="fa fa-upload" aria-hidden="true" style="color:orange;"></i> &nbsp;导出选中
+                </button>
+                <button type="button" class="btn btn-default" @click="classexport"><i class="fa fa-upload" aria-hidden="true" style="color:steelblue;"></i> &nbsp;导出查询
+                </button>
+            </div>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+    <script src="${rc.contextPath}/js/sys/expensetable.js?_${date.systemTime}"></script>
+</body>
+</html>

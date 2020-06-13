@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp">
+	<div class="input-group">
+			<input type="text" class="form-control" style="width: 25%;" v-model="dpkeyword" @keyup.enter="querydp" placeholder="名字">
+			<input type="text" class="form-control" style="width: 25%;" v-model="dpdorm" @keyup.enter="querydp" placeholder="房屋号">
+			<input type="text" class="form-control" style="width: 25%;"id="sbgTime" @keyup.enter="querydp" placeholder="开始时间">
+			<input type="text" class="form-control" style="width: 25%;" id="sendTime" @keyup.enter="querydp" placeholder="截止时间">
+		<div class="input-group-btn">
+		<button type="button" class="btn btn-default" @click="querydp"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索</button>
+		<a class="btn btn-default" @click="add"><i class="fa fa-plus" aria-hidden="true" style="color:#007bb6;"></i>&nbsp;新增</a>
+		<button type="button"  class="btn btn-default" @click="update"><i class="fa fa-pencil" aria-hidden="true" style="color: #00a157;"></i>&nbsp;修改</button>
+		<!--<button type="button" class="btn btn-default" @click="del"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;删除</button>-->
+	</div>
+	</div>
+    <table id="jqGrid"></table>
+    <div id="jqGridPager"></div>
+	<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">{{modaltitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>入住人员</div>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" @click="addp" v-model="dprelationship.pName" placeholder="入住人员"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>入住房屋</div>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" @click="dormTree" v-model="dprelationship.dAddress" placeholder="入住房屋"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>入住房间</div>
+							<div class="col-sm-9">
+								<select  class="form-control" v-model="dprelationship.rId" @blur="iFempty">
+									<option v-for="room in room" v-bind:value="room.rId">{{room.roomName}}</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>是否已交押金</div>
+								<div class="col-sm-9">
+									<label class="radio-inline">
+										<input type="radio" name="deposit" value="1" v-model="dprelationship.deposit"/> 是
+									</label>
+									<label class="radio-inline">
+										<input type="radio" name="deposit" value="0" v-model="dprelationship.deposit"/> 否
+									</label>
+								</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label">金额</div>
+							<div class="col-sm-9">
+								<input type="number" class="form-control" v-model="dprelationship.depositMoney" placeholder="金额"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>收费项</div>
+							<div class="col-sm-9" >
+								<div class="col-md-6" v-for="cost in costs">
+								<input type="checkbox"  v-bind:value="cost.id" v-model="checkedCosts">
+								<label>{{cost.cName}}&nbsp;:&nbsp;{{cost.value}}&nbsp;元</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>登记入住时间</div>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="entryTime" placeholder="登记入住时间"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>预期到期时间</div>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="endTime"  placeholder='预期到期时间'/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"  @click="saveOrUpdate">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<!-- 人员添加模态框（Modal） -->
+	<div class="modal fade" id="apModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">{{modaltitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>姓名</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" v-model="personnel.pName" placeholder="姓名"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>部室</div>
+							<div class="col-sm-10">
+								<div class="input-group"><!--保持内联，消除边框，类似于form-inline-->
+									<div class="input-group-btn"><!--不换行，与相邻元素内联，包含dropdown-->
+										<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+											<span style="font-size: 14.5px;">请选择</span><span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu">
+											<li v-for="(dpm,index) in department"><a @click="addDpm(index)">{{dpm.dpmName}}</a></li>
+										</ul>
+									</div>
+									<input type="text" class="form-control" v-model="personnel.pDepartment" placeholder="请输入部室" />
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>性别</div>
+							<div class="col-sm-10">
+								<label class="radio-inline">
+									<input type="radio" name="pSex" value="1" v-model="personnel.pSex"/> 男
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="pSex" value="0" v-model="personnel.pSex"/> 女
+								</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>联系电话</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" v-model="personnel.pPhone" placeholder="联系电话"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>人员类型</div>
+							<div class="col-sm-10">
+								<select type="text" class="form-control" v-model="personnel.pCategroy">
+									<option v-for="classions in classion" v-bind:value="classions.id">{{classions.classion}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label">身份证号码</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" v-model="personnel.pNumber" placeholder="身份证号码"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>入行时间</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="pTime" placeholder="入行时间"/>
+							</div>
+						</div>
+
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" @click="read">读卡</button>
+					<button type="button" class="btn btn-primary" @click="psaveOrUpdate">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<!-- 宿舍选择菜单 -->
+	<div id="dormLayer" style="display: none;padding:10px;">
+		<ul id="dormTree" class="ztree"></ul>
+	</div>
+</div>
+<object id="CertCtl" type="application/cert-reader" width="0" height="0">
+	<p style="color:#FF0000;">控件不可用，可能未正确安装控件及驱动，或者控件未启用。</p>
+</object>
+<script src="${rc.contextPath}/js/sys/dprelationship.js?_${date.systemTime}"></script>
+<script src="${rc.contextPath}/statics/plugins/layui/layui.js?_${date.systemTime}"></script>
+<script>
+	layui.use('laydate', function() {
+		var laydate = layui.laydate;
+		laydate.render({
+			elem: '#entryTime' ,//指定元素
+			eventElem: '#entryTime-1',
+			type:'date'
+		});
+
+		laydate.render({
+			elem: '#endTime' ,
+			eventElem: '#endTime-1',
+			event:'click',
+			type:'date'
+		});
+
+		laydate.render({
+			elem: '#pTime' ,
+			eventElem: '#pTime-1',
+			type:'date'
+		});
+		laydate.render({
+			elem: '#sendTime' ,
+			eventElem: '#sendTime-1',
+			event:'click',
+			type:'date'
+		});
+
+		laydate.render({
+			elem: '#sbgTime' ,
+			eventElem: '#sbgTime-1',
+			type:'date'
+		});
+	});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+	<link rel="stylesheet" href="${rc.contextPath}/css/sys/dorm.css">
+	<style>
+		.dorm_rooms{
+			float: left;
+			height: 250px;
+			text-align: center;
+			font-size:24px;
+			padding-top:50px;
+			font-weight: bolder;
+			color: white;
+			border: 1px #DDDDDD solid;
+		}
+		.dorm_full{
+			background-color:#A52A2A;
+		}
+		.dorm_empty{
+			background-color:#388e91;
+		}
+		.dorm{
+			padding-top:30px;
+			height: 120px;
+			width: 120px;
+			background-size:20%;
+			text-align: center;
+			color:white;
+			font-size: 14px;
+			float: left;
+			background-color:#388e91;
+			border: 1px grey solid;
+		}
+		.dorm_over{
+			padding-top:30px;
+			height: 120px;
+			width: 120px;
+			text-align: center;
+			color:white;
+			font-size:14px;
+			float: left;
+			border: 1px grey solid;
+			background-position:bottom;
+			background-repeat: no-repeat;
+			background-size:105%;
+			background-image:url("../images/dorm.png");
+		}
+		.dorm_half{
+			padding-top:30px;
+			height: 120px;
+			width: 120px;
+			text-align:center;
+			color:black;
+			font-size: 15px;
+			float: left;
+			border: 1px grey solid;
+			background-position:bottom;
+			background-repeat: no-repeat;
+			background-size:100% 50%;
+			background-image:url("../images/dorm.png");
+		}
+		.dorm_one{
+			padding-top:30px;
+			height: 120px;
+			width: 120px;
+			text-align:center;
+			color:black;
+			font-size: 14px;
+			float: left;
+			border: 1px grey solid;
+			background-position:bottom;
+			background-repeat: no-repeat;
+			background-size:100% 33.33%;
+			background-image:url("../images/dorm.png");
+		}
+		.dorm_one1{
+			padding-top:30px;
+			height: 120px;
+			width: 120px;
+			text-align:center;
+			color:black;
+			font-size: 14px;
+			float: left;
+			border: 1px grey solid;
+			background-position:bottom;
+			background-repeat: no-repeat;
+			background-size:100% 25%;
+			background-image:url("../images/dorm.png");
+		}
+		.dorm_two{
+			padding-top: 20px;
+			height: 120px;
+			width: 120px;
+			text-align:center;
+			color:black;
+			font-size: 14px;
+			float: left;
+			border: 1px grey solid;
+			background-position:bottom;
+			background-repeat: no-repeat;
+			background-size:100% 66.66%;
+			background-image:url("../images/dorm.png");
+		}
+		.dorm_three{
+			padding-top: 20px;
+			height: 120px;
+			width: 120px;
+			text-align:center;
+			color:black;
+			font-size: 14px;
+			float: left;
+			border: 1px grey solid;
+			background-position:bottom;
+			background-repeat: no-repeat;
+			background-size:100% 75%;
+			background-image:url("../images/dorm.png");
+		}
+		.dorm_show{
+			height:650px;
+		}
+		.dorm_floor{
+
+		}
+		.dorm_room{
+			float: left;
+			width:100%;
+			height:250px;
+			padding: auto;
+			display: none;
+			opacity: 0.8;
+			background-color:#388e91;
+			text-align: center;
+			border: 1px #DDDDDD solid;
+		}
+		.dorm_other{
+			float:left;
+			width:24%;
+			height:400px;
+			display: none;
+			text-align: center;
+			background:#F5F5F5;
+			border: 1px #DDDDDD solid;
+		}
+		.dorm_main{
+			float: left;
+			width:76%;
+			font-size:14px;
+			padding-left: 10px;
+			color:grey;
+			display: none;
+			font-weight: bold;
+			line-height:50px;
+			height:400px;
+			background:#F5F5F5;
+			border: 1px #DDDDDD solid;
+		}
+		.mean{
+			width:30px;
+			height:30px;
+			font-size:24px;
+		}
+		.info{
+			margin-left: 2%;
+			font-size: 14px;
+			color: whitesmoke;
+			font-weight: bold;
+		}
+		#emptable{
+			height: 682px;
+			border: 1px solid #DDDDDD;
+			overflow-y: scroll;
+		}
+		#emptable::-webkit-scrollbar{
+			display: none;
+		}
+		#deptree{
+			height: 682px;
+			overflow-y: scroll;
+			border: 2px solid #DDDDDD;
+		}
+		#deptree::-webkit-scrollbar{
+			display: none;
+		}
+	</style>
+</head>
+<body>
+<div id="rrapp">
+	<!-- 宿舍地址选择菜单 -->
+	<div class="col-xs-1"><ul>
+		<li><span class="mean" style="background-color:#388e91">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;空置</li>
+		<li><span class="mean" style="background-color:#A52A2A ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;非空置</li>
+
+	</ul></div>
+	<div class="col-xs-11" id="main-content" style="border: none;">
+		<div class="col-xs-3" id="deptree">
+			<div id="tableMain">
+				<ul id="dormTree" class="ztree1 ztree"></ul>
+			</div>
+		</div>
+		<div class="col-xs-9" id="emptable">
+			<div class="col-md-12" style="display: none;background-color:#0a6999;line-height: 30px;line-height: 30px;" id="info">
+				<span class="info">使用权管理：{{dorm.useAdmin}}</span>
+				<span class="info">使用单位：{{dorm.useUnit}}</span>
+				<span class="info">房屋号：{{dorm.dAddress}}</span>
+				<span class="info">房屋类型：{{dorm.dType==1?'合并':dorm.dType==2?'拆分':''}}</span>
+				<span class="info">房屋规格：{{dorm.dSpecification==1?'2房一厅':dorm.dSpecification==2?'3房一厅':dorm.dSpecification==3?'4房一厅':''}}</span>
+				<span class="info">房屋面积：{{dorm.dArea}}&nbsp;&nbsp;m2</span>
+			</div>
+			<div class="dorm_show">
+			 <div class="dorm_floor"></div>
+				<div class="dorm_room" id="room"></div>
+
+				<div class="dorm_main">
+					<div class="table-responsive">
+					<table class="table table-striped table-hover">
+						<caption>&nbsp;&nbsp;现住人员信息</caption>
+						<thead>
+						<tr>
+							<th>房间</th>
+							<th>名字</th>
+							<th>类型</th>
+							<th>性别</th>
+							<th>部门</th>
+							<th>电话</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr v-for="(personnel,index) in  dormPersonnel">
+							<td><input type="checkbox"  name="checkItem"  :value="index"/>&nbsp;&nbsp;{{personnel.roomName}}</td>
+							<td>{{personnel.pName}}</td>
+							<td>{{personnel.classion}}</td>
+							<td>{{personnel.pSex==1?'男':'女'}}</td>
+							<td>{{personnel.pDepartment}}</td>
+							<td>{{personnel.pPhone}}</td>
+						</tr>
+						</tbody>
+					</table>
+					</div>
+				</div>
+				<div class="dorm_other">
+					<div class="col-xs-12">&nbsp;</div>
+					<div class="col-xs-12">&nbsp;</div>
+					<div class="col-xs-12">
+						<button class="btn btn-info btn-sm" @click="into"><i class="fa fa-sign-in" aria-hidden="true"></i> 入住</button>&nbsp;&nbsp;
+						<button class="btn btn-danger btn-sm"  @click="out"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;退租</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">快捷入住</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>入住人员</div>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" @click="addp" v-model="dprelationship.pName" placeholder="入住人员"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>入住房屋</div>
+							<div class="col-sm-9">
+								<input type="text" disabled="disabled" class="form-control"  v-model="dprelationship.dAddress" placeholder="入住宿舍"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>选择房间</div>
+							<div class="col-sm-9">
+								<select class="form-control" v-model="dprelationship.rId" @blur="iFempty">
+									<option  v-for="(rooms,index) in room" v-bind:value="rooms.rId">{{rooms.roomName}}</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>是否已交押金</div>
+							<div class="col-sm-9">
+								<label class="radio-inline">
+									<input type="radio" name="deposit" value="1" v-model="dprelationship.deposit"/> 是
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="deposit" value="0" v-model="dprelationship.deposit"/> 否
+								</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label">金额</div>
+							<div class="col-sm-9">
+								<input type="number" class="form-control" v-model="dprelationship.depositMoney" placeholder="金额"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>收费项</div>
+							<div class="col-sm-9">
+								<div class="col-md-6" v-for="cost in costs">
+									<input type="checkbox"  v-bind:value="cost.id" v-model="checkedCosts">
+									<label>{{cost.cName}}&nbsp;:&nbsp;{{cost.value}}&nbsp;元</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>登记入住时间</div>
+							<div class="col-sm-9">
+								<input type="text" class="form-control"  id="beingTime" placeholder="登记入住时间"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-3 control-label"><span style="color:red;">*</span>预期到期时间</div>
+							<div class="col-sm-9">
+								<input type="text" class="form-control"  id="endTime" placeholder="预期到期时间"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary"  @click="saveOrUpdate">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+	<!-- 人员添加模态框（Modal） -->
+	<div class="modal fade" id="apModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">新增</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>姓名</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" v-model="personnel.pName" placeholder="姓名"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>部室</div>
+							<div class="col-sm-10">
+								<div class="input-group"><!--保持内联，消除边框，类似于form-inline-->
+									<div class="input-group-btn"><!--不换行，与相邻元素内联，包含dropdown-->
+										<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+											<span style="font-size: 14.5px;">请选择</span><span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu">
+											<li v-for="(dpm,index) in department"><a @click="addDpm(index)">{{dpm.dpmName}}</a></li>
+										</ul>
+									</div>
+									<input type="text" class="form-control" v-model="personnel.pDepartment" placeholder="请输入部室" />
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>性别</div>
+							<div class="col-sm-10">
+								<label class="radio-inline">
+									<input type="radio" name="pSex" value="1" v-model="personnel.pSex"/> 男
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="pSex" value="0" v-model="personnel.pSex"/> 女
+								</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>联系电话</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" v-model="personnel.pPhone" placeholder="联系电话"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>人员类型</div>
+							<div class="col-sm-10">
+								<select type="text" class="form-control" v-model="personnel.pCategroy">
+									<option v-for="classions in classion" v-bind:value="classions.id">{{classions.classion}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label">身份证号码</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" v-model="personnel.pNumber" placeholder="身份证号码"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2 control-label"><span style="color:red;">*</span>入行时间</div>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="pTime" placeholder="入行时间"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" @click="read">读卡</button>
+					<button type="button" class="btn btn-primary" @click="psaveOrUpdate">确定</button>
+					<input type="button" class="btn btn-warning"  data-dismiss="modal" value="取消"/>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal -->
+	</div>
+</div>
+<object id="CertCtl" type="application/cert-reader" width="0" height="0">
+	<p style="color:#FF0000;">控件不可用，可能未正确安装控件及驱动，或者控件未启用。</p>
+</object>
+<script src="${rc.contextPath}/js/sys/dorm.js?_${date.systemTime}"></script>
+<script src="${rc.contextPath}/statics/plugins/layui/layui.js?_${date.systemTime}"></script>
+<script>
+	layui.use('laydate', function() {
+		var laydate = layui.laydate;
+		//执行一个laydate实例
+		laydate.render({
+			elem: '#beingTime' ,//指定元素
+			type:'date',
+			trigger: 'click'
+		});
+
+		laydate.render({
+			elem: '#endTime' ,
+			type:'date',
+			trigger: 'click'
+		});
+
+		laydate.render({
+			elem: '#pTime' ,
+			type:'date',
+			trigger: 'click'
+		});
+	});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.ClassionDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.ClassionEntity">
+		select * from classion where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.ClassionEntity">
+		select * from classion 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from classion 
+	</select>
+
+    <insert id="saveBatch">
+        insert into classion
+        (
+												`id`, 
+																`classion`, 
+																`add_time`, 
+																`add_name`
+							        )
+        VALUES
+        <foreach collection ="list" item="com.ketansoft.dms.entity.ClassionEntity" separator =",">
+		(
+									#{id}, 
+												#{classion}, 
+												#{addTime}, 
+												#{addName}
+					         )
+        </foreach>
+    </insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.ClassionEntity">
+		insert into classion
+		(
+												`id`, 
+															`classion`, 
+															`add_time`, 
+															`add_name`
+								)
+		values
+		(
+												#{id}, 
+															#{classion}, 
+															#{addTime}, 
+															#{addName}
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.ClassionEntity">
+		update classion 
+		<set>
+															<if test="classion != null">`classion` = #{classion}, </if>
+												<if test="addTime != null">`add_time` = #{addTime}, </if>
+												<if test="addName != null">`add_name` = #{addName}</if>
+								</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from classion where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from classion where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    #parse("sys/header.html")
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="rrapp">
+    <div class="col-md-12">
+        <div class="col-md-4">
+            <label class="radio-inline">
+                <input type="radio" name="sp" value="" v-model="dSpecification"/> 全部&nbsp;&nbsp;&nbsp;
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="sp" value="1" v-model="dSpecification"/> 2房一厅&nbsp;&nbsp;&nbsp;
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="sp" value="2" v-model="dSpecification"/> 3房一厅&nbsp;&nbsp;&nbsp;
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="sp" value="3" v-model="dSpecification"/> 4房一厅&nbsp;&nbsp;&nbsp;
+            </label>
+        </div>
+        <div class="col-md-8">
+            <div class="input-group">
+                <input type="text" class="form-control" v-model="dorm" @keyup.enter="querydp" placeholder="房屋号">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default" @click="query"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;搜索</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">&nbsp;</div>
+        <div class="col-md-6">
+            <table id="jqGrid1"></table>
+            <div id="jqGridPager1"></div>
+        </div>
+        <div class="col-md-6">
+            <table id="jqGrid2"></table>
+            <div id="jqGridPager2"></div>
+        </div>
+    </div>
+    <div class="col-md-12" style="border: 1px #DDDDDD solid;width: 96%;margin-left: 2%;margin-top: 10px;">
+        <div class="col-md-6" style="border-right: 1px #DDDDDD solid">
+            <div id="main1" style="width:100%;height:400px;"></div>
+        </div>
+        <div class="col-md-6">
+            <div id="main2" style="width:100%;height:400px;"></div>
+        </div>
+    </div>
+</div>
+<script src="${rc.contextPath}/statics/plugins/echarts/echarts.js"></script>
+<script src="${rc.contextPath}/js/sys/home.js?_${date.systemTime}"></script>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<script type="text/javascript">
+    var data=[];
+    $.get("../dormtable/showdata",function (r) {
+        vm.showdata.sum=r.res[0];
+        vm.showdata.nownum=r.res[1];
+        vm.showdata.nullnum=r.res[2];
+        vm.showdata.reta=r.res[3];
+        data.push(vm.showdata.sum);
+        data.push(vm.showdata.nownum);
+        data.push(vm.showdata.nullnum);
+        // 基于准备好的dom，初始化echarts实例
+        show1(data);
+        show2(vm.showdata.reta);
+
+    });
+    function show1(data) {
+        var myChart1 = echarts.init(document.getElementById('main1'));
+
+        var option1 = {
+            color:["#0088A8"],
+            title : {
+                text: '房屋使用情况',
+            },
+            tooltip : {
+                trigger: 'axis'
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},
+                    magicType : {show: true, type: ['line', 'bar']},
+                    restore : {show: true},
+                    saveAsImage : {show: true}
+                }
+            },
+            calculable : true,
+            xAxis : [
+                {
+                    type : 'category',
+                    data : ['总房间数','总入住数','总空房数',' ']
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value'
+                }
+            ],
+            series : [
+                {
+                    name:'房间数',
+                    type:'bar',
+                    data:data,
+                    markPoint : {
+                        data : [
+                            {type : 'max', name: '最大值'},
+                            {type : 'min', name: '最小值'}
+                        ]
+                    },
+                    markLine : {
+                        data : [
+                            {type : 'average', name: '平均值'}
+                        ]
+                    }
+                },
+            ]
+        };
+        myChart1.setOption(option1);
+
+    }
+    function show2(reta){
+        // 基于准备好的dom，初始化echarts实例
+        var myChart2 = echarts.init(document.getElementById('main2'));
+
+        // 指定图表的配置项和数据
+        var option2 = {
+            title: {
+                text: '房屋使用率', //标题文本内容
+            },
+            toolbox: { //可视化的工具箱
+                show: true,
+                feature: {
+                    restore: { //重置
+                        show: true
+                    },
+                    saveAsImage: {//保存图片
+                        show: true
+                    }
+                }
+            },
+            tooltip: { //弹窗组件
+                formatter: "{a} <br/>{b} : {c}%"
+            },
+            series: [{
+                name: '使用率',
+                type: 'gauge',
+                detail: {formatter:'{value}%'},
+                data: [{value:reta, name: '使用率'}]
+            }]
+
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart2.setOption(option2);
+    }
+
+    // 使用刚指定的配置项和数据显示图表。
+
+    $(function () {
+        $("#jqGrid1").jqGrid({
+            url: '../dormtable/controllist1',
+            datatype: "json",
+            colModel: [
+                { label:'ID',name:'dId',width:50,key:true,hidden:true},
+                { label: '房屋号', name:'dAddress', width:80 },
+                { label: '房屋规格', name: 'dSpecification', width: 80,formatter:function (value, options, row) {
+                        if(value==1){
+                            return '2房一厅';
+                        }else if(value==2){
+                            return '3房一厅';
+                        }else if(value==3){
+                            return '4房一厅';
+                        }else{
+                            return '';
+                        }
+                    } },
+                { label: '使用权管理', name:'useAdmin', width:80 },
+                { label: '使用单位', name:'useUnit', width:80 },
+                { label: '可住人数', name: 'dAllnum', width: 80 },
+                { label: '现住人数', name: 'dNum', width: 80 },
+            ],
+            viewrecords: true,
+            height:200,
+            rowNum: 5,
+            rowList : [5,10,20],
+            rownumbers: true,
+            rownumWidth: 25,
+            autowidth:true,
+            caption : "合并类型房屋",
+            pager: "#jqGridPager1",
+            jsonReader : {
+                root: "page.list",
+                page: "page.currPage",
+                total: "page.totalPage",
+                records: "page.totalCount",
+            },
+            prmNames : {
+                page:"page",
+                rows:"limit",
+                order: "order"
+            },
+            gridComplete:function(){
+                //隐藏grid底部滚动条
+                $("#jqGrid1").closest(".ui-jqgrid-bdiv").css({ "overflow-x" : "hidden" });
+            }
+        });
+        $(function () {
+            $("#jqGrid2").jqGrid({
+                url: '../dormtable/controllist2',
+                datatype: "json",
+                colModel: [
+                    {label: 'ID', name: 'dId', width: 50, key: true, hidden: true},
+                    {label: '房屋号', name: 'dAddress', width: 80},
+                    { label: '房屋规格', name: 'dSpecification', width: 80,formatter:function (value, options, row) {
+                            if(value==1){
+                                return '2房一厅';
+                            }else if(value==2){
+                                return '3房一厅';
+                            }else if(value==3){
+                                return '4房一厅';
+                            }else{
+                                return '';
+                            }
+                        } },
+                    {label: '使用权管理', name: 'useAdmin', width: 80},
+                    {label: '使用部门', name: 'useUnit', width: 80},
+                    {label: '可住人数', name: 'dAllnum', width: 80},
+                    { label: '现住人数', name: 'dNum', width: 80 },
+                ],
+                viewrecords: true,
+                height: 200,
+                rowNum: 5,
+                rowList: [5, 10, 20],
+                rownumbers: true,
+                rownumWidth: 25,
+                autowidth: true,
+                caption : "拆分类型房屋",
+                pager: "#jqGridPager2",
+                jsonReader: {
+                    root: "page.list",
+                    page: "page.currPage",
+                    total: "page.totalPage",
+                    records: "page.totalCount",
+                },
+                prmNames: {
+                    page: "page",
+                    rows: "limit",
+                    order: "order"
+                },
+                gridComplete: function () {
+                    //隐藏grid底部滚动条
+                    $("#jqGrid2").closest(".ui-jqgrid-bdiv").css({"overflow-x": "hidden"});
+                }
+            });
+        });
+    });
+
+    var vm = new Vue({
+        el: '#rrapp',
+        data: {
+            showdata:{
+                sum:null,
+                nownum:null,
+                nullnum:null,
+                reta:null
+            },
+            dorm:null,
+            dSpecification:null,
+            isShow: true
+        },
+
+        methods:{
+            query:function (event) {
+                $("#jqGrid1").jqGrid('setGridParam',{
+                    postData: {
+                        "dorm":vm.dorm,
+                        "dSpecification":vm.dSpecification
+                    },
+                    page:1
+                }).trigger("reloadGrid");
+                $("#jqGrid2").jqGrid('setGridParam',{
+                    postData: {
+                        "dorm":vm.dorm,
+                        "dSpecification":vm.dSpecification
+                    },
+                    page:1
+                }).trigger("reloadGrid");
+            }
+        },
+    });
+</script>
+</body>
+</html>

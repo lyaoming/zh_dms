@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketansoft.dms.mapper.UseUnitDao">
+
+	<select id="queryObject" resultType="com.ketansoft.dms.entity.UseUnitEntity">
+		select * from use_unit where t_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.ketansoft.dms.entity.UseUnitEntity">
+		select * from use_unit 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from use_unit 
+	</select>
+
+    <insert id="saveBatch">
+        insert into use_unit
+        (
+																			`use_unit`, 
+																`add_time`, 
+																`add_name`
+							        )
+        VALUES
+        <foreach collection ="list" item="com.ketansoft.dms.entity.UseUnitEntity" separator =",">
+		(
+									#{tId}, 
+												#{useUnit}, 
+												#{addTime}, 
+												#{addName}
+					         )
+        </foreach>
+    </insert>
+
+	<insert id="save" parameterType="com.ketansoft.dms.entity.UseUnitEntity" useGeneratedKeys="true" keyProperty="tId">
+		insert into use_unit
+		(
+																		`use_unit`, 
+															`add_time`, 
+															`add_name`
+								)
+		values
+		(
+																		#{useUnit}, 
+															#{addTime}, 
+															#{addName}
+								)
+	</insert>
+	 
+	<update id="update" parameterType="com.ketansoft.dms.entity.UseUnitEntity">
+		update use_unit 
+		<set>
+															<if test="useUnit != null">`use_unit` = #{useUnit}, </if>
+												<if test="addTime != null">`add_time` = #{addTime}, </if>
+												<if test="addName != null">`add_name` = #{addName}</if>
+								</set>
+		where t_id = #{tId}
+	</update>
+	
+	<delete id="delete">
+		delete from use_unit where t_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from use_unit where t_id in 
+		<foreach item="tId" collection="array" open="(" separator="," close=")">
+			#{tId}
+		</foreach>
+	</delete>
+
+</mapper>
